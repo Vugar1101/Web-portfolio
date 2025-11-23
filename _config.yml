@@ -30,7 +30,7 @@ linkedin_username: vugar-mirza
 footer_message: "© 2025 Vugar Mirza. All rights reserved."
 
 header_pages:
-  - index.markdown
+  - index.md
   - about.markdown
   - projects.md
   - resume.md
