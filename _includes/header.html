@@ -1,0 +1,70 @@
+<div class="site-marquee" aria-live="polite">
+  <div class="wrapper">
+    <div class="site-marquee__inner">
+      <span class="site-marquee__quote">
+        “Your profession, current status or title, educational background, or professional experience do not define who you truly are. Who you want to become is who you really are. Therefore, desire and strive to become the person you want to be.” — Vugar Mirza
+      </span>
+      <span class="site-marquee__quote">
+        “Your profession, current status or title, educational background, or professional experience do not define who you truly are. Who you want to become is who you really are. Therefore, desire and strive to become the person you want to be.” — Vugar Mirza
+      </span>
+    </div>
+  </div>
+</div>
+
+<header class="site-header" role="banner">
+  <div class="wrapper site-header__inner">
+    <div class="site-brand">
+      <p class="site-brand__eyebrow">Web-Portfolio</p>
+      <a class="site-title" rel="author" href="{{ "/" | relative_url }}">{{ site.title | escape }}</a>
+      <div class="site-brand__welcome">
+        <a href="https://www.instagram.com/benjamin.buttons.1/" target="_blank" rel="noopener noreferrer" class="instagram-icon-link" aria-label="Follow on Instagram">
+          <svg class="instagram-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" fill="currentColor"/>
+          </svg>
+        </a>
+      </div>
+      <p class="site-tagline">{{ site.description | default: "Designing thoughtful products with code, research, and care." }}</p>
+    </div>
+
+    <div class="site-header__video">
+      <video controls controlsList="nodownload noplaybackrate nofullscreen noremoteplayback" autoplay loop muted playsinline disablePictureInPicture oncontextmenu="return false;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <source src="{{ '/assets/video/portfolio-video.mp4' | relative_url }}" type="video/mp4">
+        <source src="{{ '/assets/video/portfolio-video.webm' | relative_url }}" type="video/webm">
+        Your browser does not support the video tag.
+      </video>
+      <div class="video-placeholder" style="display: none;">
+        <div class="video-placeholder-content">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          <p>Video will appear here</p>
+          <p class="video-instructions">Add your video as <code>assets/video/portfolio-video.mp4</code></p>
+        </div>
+      </div>
+    </div>
+
+    {%- assign default_paths = site.pages | map: "path" -%}
+    {%- assign page_paths = site.header_pages | default: default_paths -%}
+    {%- if page_paths -%}
+      <nav class="site-nav site-nav--pill">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          {%- for path in page_paths -%}
+            {%- assign my_page = site.pages | where: "path", path | first -%}
+            {%- if my_page.title -%}
+              <a class="page-link" href="{{ my_page.url | relative_url }}">{{ my_page.title | escape }}</a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </nav>
+    {%- endif -%}
+  </div>
+</header>
