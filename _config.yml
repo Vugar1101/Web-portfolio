@@ -60,7 +60,7 @@ plugins:
 #   - vendor/gems/
 #   - vendor/ruby/
 sass:
-  sass_dir: _sass
+  sass_dir: assets/css
   style: compressed
 minima:
   skin: classic
