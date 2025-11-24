@@ -22,8 +22,8 @@ title: Welcome to the web-portfolio of Vugar Mirza
 email: vugar.mirza@example.com
 description: >-
   The video you see on the right-hand side of the screen is a project I worked on with my team. Click the instagram icon to get acquainted with our social responsibility project which was granted as 1st place by Haji Zeynalabdin Taghiyev Award.
-baseurl: "/Web-portfolio" # the subpath of your site for GitHub Pages
-url: "https://vugar1101.github.io" # the base hostname & protocol for your site
+baseurl: "/Web-portfolio" # the subpath of your site, e.g. /blog (use "" for user pages, "/repository" for project pages)
+url: "https://vugar-mirza.github.io" # Change this to your GitHub Pages URL
 twitter_username: vugar_codes
 github_username:  vugar-mirza
 linkedin_username: vugar-mirza
