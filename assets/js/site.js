@@ -95,6 +95,44 @@ const autoAddReveal = () => {
 document.addEventListener("DOMContentLoaded", () => {
   const header = document.querySelector(".site-header");
   
+  // Video loading state - needs to be accessible to navigation handler
+  let videoLoaded = false;
+  
+  // Cleanup tracking for intervals and timeouts
+  const activeIntervals = [];
+  const activeTimeouts = [];
+  
+  // Helper to track and clear intervals
+  const trackedSetInterval = (callback, delay) => {
+    const id = setInterval(callback, delay);
+    activeIntervals.push(id);
+    return id;
+  };
+  
+  // Helper to track and clear timeouts
+  const trackedSetTimeout = (callback, delay) => {
+    const id = setTimeout(callback, delay);
+    activeTimeouts.push(id);
+    return id;
+  };
+  
+  // Store AbortControllers for cleanup
+  const abortControllers = [];
+  
+  // Cleanup function
+  const cleanup = () => {
+    activeIntervals.forEach(id => clearInterval(id));
+    activeTimeouts.forEach(id => clearTimeout(id));
+    activeIntervals.length = 0;
+    activeTimeouts.length = 0;
+    abortControllers.forEach(controller => controller.abort());
+    abortControllers.length = 0;
+  };
+  
+  // Cleanup on page unload
+  window.addEventListener("beforeunload", cleanup);
+  window.addEventListener("unload", cleanup);
+  
   // Run auto-add reveal on initial load
   autoAddReveal();
   
@@ -160,6 +198,112 @@ document.addEventListener("DOMContentLoaded", () => {
         const isHomePage = href === "/" || href === "/index.html" || href.endsWith("/") || href.includes("/index");
         if (isHomePage) {
           document.body.className = "page-home";
+          
+          // Reinitialize video when returning to home page
+          const homeVideo = document.querySelector(".site-header__video video");
+          const videoContainer = homeVideo ? homeVideo.closest(".site-header__video") : null;
+          const placeholder = videoContainer ? videoContainer.querySelector(".video-placeholder") : null;
+          
+          if (homeVideo) {
+            // Reset video loaded state to allow it to reload
+            videoLoaded = false;
+            
+            // Ensure video container is visible (not in compact mode)
+            if (header && header.classList.contains("site-header--compact")) {
+              header.classList.remove("site-header--compact");
+            }
+            
+            // Ensure video is visible and placeholder is hidden
+            homeVideo.style.display = "block";
+            homeVideo.style.visibility = "visible";
+            if (placeholder) {
+              placeholder.style.display = "none";
+            }
+            
+            // Set preload to auto if not already set
+            if (homeVideo.getAttribute("preload") !== "auto") {
+              homeVideo.setAttribute("preload", "auto");
+            }
+            
+            // Set up error handler
+            let errorHandled = false;
+            let errorTimeout;
+            const handleVideoError = () => {
+              if (errorHandled) return;
+              if (errorTimeout) {
+                clearTimeout(errorTimeout);
+                const index = activeTimeouts.indexOf(errorTimeout);
+                if (index > -1) activeTimeouts.splice(index, 1);
+              }
+              
+              errorTimeout = trackedSetTimeout(() => {
+                if (homeVideo && homeVideo.error && homeVideo.error.code !== 0) {
+                  errorHandled = true;
+                  homeVideo.style.display = "none";
+                  if (placeholder) {
+                    placeholder.style.display = "flex";
+                  }
+                }
+              }, 3000);
+            };
+            
+            const navErrorController = new AbortController();
+            abortControllers.push(navErrorController);
+            homeVideo.addEventListener("error", handleVideoError, { 
+              once: false,
+              signal: navErrorController.signal
+            });
+            
+            // Hide placeholder when video loads successfully
+            const hidePlaceholder = () => {
+              if (errorTimeout) {
+                clearTimeout(errorTimeout);
+                const index = activeTimeouts.indexOf(errorTimeout);
+                if (index > -1) activeTimeouts.splice(index, 1);
+              }
+              errorHandled = false;
+              videoLoaded = true;
+              if (homeVideo) {
+                homeVideo.style.display = "block";
+                homeVideo.style.visibility = "visible";
+              }
+              if (placeholder) {
+                placeholder.style.display = "none";
+              }
+            };
+            
+            homeVideo.addEventListener("loadeddata", hidePlaceholder, { once: true });
+            homeVideo.addEventListener("canplay", hidePlaceholder, { once: true });
+            homeVideo.addEventListener("loadedmetadata", hidePlaceholder, { once: true });
+            
+            // Check if video is ready
+            if (homeVideo.readyState >= 2) {
+              videoLoaded = true;
+              // Ensure video plays
+              homeVideo.play().catch(err => {
+                console.log("Video autoplay prevented:", err);
+              });
+            } else {
+              // Force video to reload
+              homeVideo.load();
+              
+              // Retry if needed
+              trackedSetTimeout(() => {
+                if (homeVideo && homeVideo.readyState === 0) {
+                  homeVideo.load();
+                }
+              }, 100);
+              
+              // Try to play when video is ready
+              const tryPlay = () => {
+                homeVideo.play().catch(err => {
+                  console.log("Video autoplay prevented:", err);
+                });
+              };
+              homeVideo.addEventListener("canplay", tryPlay, { once: true });
+              homeVideo.addEventListener("loadeddata", tryPlay, { once: true });
+            }
+          }
         } else {
           document.body.className = "page-content-page";
         }
@@ -176,6 +320,19 @@ document.addEventListener("DOMContentLoaded", () => {
         // Remove compact mode from header
         if (header && header.classList.contains("site-header--compact")) {
           header.classList.remove("site-header--compact");
+        }
+        
+        // If returning to home page, ensure video is visible and not in compact mode
+        if (isHomePage) {
+          // Scroll to top first to ensure we're not in compact mode
+          window.scrollTo({ top: 0, behavior: "auto" });
+          
+      // Wait a bit for video to start loading before checking scroll position
+      trackedSetTimeout(() => {
+        if (window.scrollY <= 50 && header && header.classList.contains("site-header--compact")) {
+          header.classList.remove("site-header--compact");
+        }
+      }, 100);
         }
         
         // Set initial state for pop-up animation
@@ -260,6 +417,9 @@ document.addEventListener("DOMContentLoaded", () => {
   navLinks.forEach(link => {
     link.addEventListener("click", handleNavClick, false);
   });
+  
+  // Welcome message (site-title) link should do a full page refresh
+  // No custom handler needed - let it do normal page navigation
   
   // Handle browser back/forward buttons
   window.addEventListener("popstate", async (e) => {
@@ -404,6 +564,223 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Header compact mode on scroll with throttling
   let ticking = false;
+  
+  // Initialize: Check if video is already loaded
+  const headerVideo = document.querySelector(".site-header__video video");
+  const isHomePageOnLoad = document.body.classList.contains("page-home");
+  
+  if (headerVideo && isHomePageOnLoad) {
+    // On home page, ensure video starts loading
+    // Make sure video container is visible first (not in compact mode)
+    const videoContainer = headerVideo.closest(".site-header__video");
+    const placeholder = videoContainer ? videoContainer.querySelector(".video-placeholder") : null;
+    
+    if (videoContainer && header.classList.contains("site-header--compact")) {
+      header.classList.remove("site-header--compact");
+    }
+    
+    // Ensure video is visible and placeholder is hidden
+    headerVideo.style.display = "block";
+    headerVideo.style.visibility = "visible";
+    if (placeholder) {
+      placeholder.style.display = "none";
+    }
+    
+    // Set preload to auto if not already set
+    if (headerVideo.getAttribute("preload") !== "auto") {
+      headerVideo.setAttribute("preload", "auto");
+    }
+    
+    // Set up error handler - but be more lenient
+    let errorHandled = false;
+    let errorTimeout;
+    const handleVideoError = () => {
+      if (errorHandled) return;
+      
+      // Clear any existing timeout
+      if (errorTimeout) {
+        clearTimeout(errorTimeout);
+        const index = activeTimeouts.indexOf(errorTimeout);
+        if (index > -1) activeTimeouts.splice(index, 1);
+      }
+      
+      // Wait longer before showing placeholder - give video more time
+      errorTimeout = trackedSetTimeout(() => {
+        if (headerVideo && headerVideo.error && headerVideo.error.code !== 0) {
+          // Only show placeholder if there's a persistent error
+          errorHandled = true;
+          headerVideo.style.display = "none";
+          if (placeholder) {
+            placeholder.style.display = "flex";
+          }
+        }
+      }, 3000); // Wait 3 seconds before showing placeholder
+    };
+    
+    // Use AbortController to manage event listeners
+    const errorController = new AbortController();
+    abortControllers.push(errorController);
+    headerVideo.addEventListener("error", handleVideoError, { 
+      once: false,
+      signal: errorController.signal
+    });
+    
+    // Hide placeholder when video loads successfully - multiple events
+    const hidePlaceholder = () => {
+      if (errorTimeout) {
+        clearTimeout(errorTimeout);
+        const index = activeTimeouts.indexOf(errorTimeout);
+        if (index > -1) activeTimeouts.splice(index, 1);
+      }
+      errorHandled = false;
+      headerVideo.style.display = "block";
+      headerVideo.style.visibility = "visible";
+      if (placeholder) {
+        placeholder.style.display = "none";
+      }
+      // Ensure video plays when it loads - ensure muted for autoplay
+      if (headerVideo) {
+        headerVideo.muted = true;
+        headerVideo.play().catch(err => {
+          console.log("Video autoplay prevented:", err);
+          // Retry after a short delay
+          trackedSetTimeout(() => {
+            if (headerVideo && headerVideo.readyState >= 2) {
+              headerVideo.play().catch(() => {});
+            }
+          }, 200);
+        });
+      }
+    };
+    
+    // Use a single handler to avoid duplicate event listeners
+    const videoReadyHandler = () => {
+      hidePlaceholder();
+      // Ensure video plays
+      if (headerVideo && headerVideo.paused) {
+        headerVideo.muted = true;
+        headerVideo.play().catch(err => {
+          console.log("Video autoplay prevented:", err);
+        });
+      }
+    };
+    
+    headerVideo.addEventListener("loadeddata", videoReadyHandler, { once: true });
+    headerVideo.addEventListener("canplay", videoReadyHandler, { once: true });
+    headerVideo.addEventListener("loadedmetadata", videoReadyHandler, { once: true });
+    
+    // Force video to start loading immediately
+    headerVideo.load();
+    
+    // Unified function to attempt playing the video
+    const attemptVideoPlay = () => {
+      if (!headerVideo) return;
+      
+      // Ensure video is muted for autoplay (required by browsers)
+      headerVideo.muted = true;
+      
+      // Only try to play if video has enough data
+      if (headerVideo.readyState >= 2) {
+        headerVideo.play().catch(err => {
+          // Autoplay was prevented - this is normal in some browsers
+          // Video will play when user interacts with page
+          console.log("Video autoplay prevented (this is normal):", err.name);
+        });
+      } else if (headerVideo.readyState >= 1) {
+        // Has metadata, wait a bit for more data
+        trackedSetTimeout(attemptVideoPlay, 200);
+      }
+    };
+    
+    // Try to play immediately if ready
+    attemptVideoPlay();
+    
+    // Also try after video loads more data
+    trackedSetTimeout(() => {
+      if (headerVideo && headerVideo.readyState === 0) {
+        headerVideo.load();
+      }
+      attemptVideoPlay();
+    }, 100);
+    
+    // Additional attempts for slow-loading videos
+    trackedSetTimeout(attemptVideoPlay, 300);
+    trackedSetTimeout(attemptVideoPlay, 600);
+    
+    // Check current ready state
+    if (headerVideo.readyState >= 2) {
+      videoLoaded = true;
+      // Ensure video plays immediately if ready
+      headerVideo.play().catch(err => {
+        console.log("Video autoplay prevented:", err);
+      });
+    } else {
+      // Wait for video to load with multiple event listeners
+      const playWhenReady = () => {
+        videoLoaded = true;
+        // Try to play when video is ready - ensure muted for autoplay
+        if (headerVideo) {
+          headerVideo.muted = true;
+          headerVideo.play().catch(err => {
+            console.log("Video autoplay prevented:", err);
+            // Retry after a short delay
+            trackedSetTimeout(() => {
+              if (headerVideo && headerVideo.readyState >= 2) {
+                headerVideo.play().catch(() => {});
+              }
+            }, 200);
+          });
+        }
+      };
+      
+      // Use the same handler to avoid conflicts
+      headerVideo.addEventListener("loadeddata", playWhenReady, { once: true });
+      headerVideo.addEventListener("canplay", playWhenReady, { once: true });
+      
+      // Consolidated metadata handler
+      const metadataHandler = () => {
+        if (headerVideo && headerVideo.readyState >= 1) {
+          videoLoaded = true;
+          playWhenReady();
+        }
+      };
+      headerVideo.addEventListener("loadedmetadata", metadataHandler, { once: true });
+      
+      headerVideo.addEventListener("error", () => {
+        // If video fails to load, allow compact mode after a delay
+        trackedSetTimeout(() => {
+          videoLoaded = true;
+        }, 1000);
+      }, { once: true });
+      
+      // Also check periodically in case events don't fire
+      let checkCount = 0;
+      const maxChecks = 30; // 3 seconds max wait
+      const checkInterval = trackedSetInterval(() => {
+        checkCount++;
+        if (headerVideo.readyState >= 2) {
+          videoLoaded = true;
+          // Try to play when ready
+          headerVideo.play().catch(err => {
+            console.log("Video autoplay prevented:", err);
+          });
+          clearInterval(checkInterval);
+          const index = activeIntervals.indexOf(checkInterval);
+          if (index > -1) activeIntervals.splice(index, 1);
+        } else if (checkCount >= maxChecks) {
+          // After max time, give up and allow compact mode
+          videoLoaded = true;
+          clearInterval(checkInterval);
+          const index = activeIntervals.indexOf(checkInterval);
+          if (index > -1) activeIntervals.splice(index, 1);
+        }
+      }, 100);
+    }
+  } else {
+    // No video element or not home page, allow compact mode immediately
+    videoLoaded = true;
+  }
+  
   const handleScroll = () => {
     if (!header) return;
     
@@ -411,6 +788,33 @@ document.addEventListener("DOMContentLoaded", () => {
       window.requestAnimationFrame(() => {
         const shouldBeCompact = window.scrollY > 50;
         const isCompact = header.classList.contains("site-header--compact");
+        const isHomePage = document.body.classList.contains("page-home");
+        
+        // On home page, only apply compact mode if video has loaded or user has scrolled significantly
+        if (isHomePage && headerVideo && !videoLoaded) {
+          // Check if video is ready to play
+          if (headerVideo.readyState >= 2) { // HAVE_CURRENT_DATA or higher
+            videoLoaded = true;
+          } else {
+            // If video hasn't loaded yet and we're at top, don't hide it
+            if (window.scrollY <= 50) {
+              ticking = false;
+              return;
+            }
+            // If scrolled but video not loaded, wait a bit more
+            if (shouldBeCompact && !isCompact) {
+            // Delay compact mode to give video time to load
+            trackedSetTimeout(() => {
+              if (headerVideo && headerVideo.readyState >= 2) {
+                videoLoaded = true;
+                header.classList.add("site-header--compact");
+              }
+            }, 500);
+              ticking = false;
+              return;
+            }
+          }
+        }
         
         if (shouldBeCompact && !isCompact) {
           header.classList.add("site-header--compact");
@@ -424,12 +828,111 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  handleScroll();
+  // Only apply compact mode on initial load if video is ready
+  // On home page, always wait a bit to ensure video has time to start loading
+  if (window.scrollY > 50) {
+    if (isHomePageOnLoad && headerVideo) {
+      // On home page with video, wait for video to load before applying compact mode
+      // Don't apply compact mode immediately - give video time to load
+      const applyCompactWhenReady = () => {
+        if (videoLoaded || (headerVideo && headerVideo.readyState >= 2)) {
+          handleScroll();
+        } else {
+          // Check again in 200ms, but max 3 seconds total
+          trackedSetTimeout(applyCompactWhenReady, 200);
+        }
+      };
+      // Start checking after a short delay to give video time to start loading
+      trackedSetTimeout(applyCompactWhenReady, 200);
+    } else {
+      // Not home page or no video, apply compact mode immediately
+      handleScroll();
+    }
+  }
+  
   window.addEventListener("scroll", handleScroll, { passive: true });
 
   // Video autoplay with max volume and hide unwanted controls
+  // Only set up additional handlers if we haven't already handled this video on home page
   const video = document.querySelector(".site-header__video video");
-  if (video) {
+  const videoPlaceholder = document.querySelector(".site-header__video .video-placeholder");
+  
+  // Skip duplicate setup if we already handled headerVideo on home page
+  if (video && video !== headerVideo) {
+    // Handle video errors properly - only show placeholder if video truly fails
+    let errorTimeout;
+    const videoErrorController = new AbortController();
+    abortControllers.push(videoErrorController);
+    video.addEventListener("error", (e) => {
+      // Clear any pending timeouts
+      if (errorTimeout) {
+        clearTimeout(errorTimeout);
+        const index = activeTimeouts.indexOf(errorTimeout);
+        if (index > -1) activeTimeouts.splice(index, 1);
+      }
+      
+      // Wait a bit before showing placeholder - video might recover
+      errorTimeout = trackedSetTimeout(() => {
+        // Only show placeholder if video still has error after retry
+        if (video && video.error && video.error.code === video.error.MEDIA_ERR_SRC_NOT_SUPPORTED) {
+          // Video format not supported - show placeholder
+          video.style.display = "none";
+          if (videoPlaceholder) {
+            videoPlaceholder.style.display = "flex";
+          }
+        } else if (video && video.error && video.error.code === video.error.MEDIA_ERR_NETWORK) {
+          // Network error - try to reload once
+          video.load();
+          // If still fails after reload, show placeholder
+          trackedSetTimeout(() => {
+            if (video && video.error) {
+              video.style.display = "none";
+              if (videoPlaceholder) {
+                videoPlaceholder.style.display = "flex";
+              }
+            }
+          }, 2000);
+        }
+      }, 1000); // Wait 1 second before showing placeholder
+    }, { once: false, signal: videoErrorController.signal });
+    
+    // Ensure placeholder is hidden when video loads successfully
+    const playVideoWhenReady = () => {
+      if (errorTimeout) {
+        clearTimeout(errorTimeout);
+        const index = activeTimeouts.indexOf(errorTimeout);
+        if (index > -1) activeTimeouts.splice(index, 1);
+      }
+      video.style.display = "block";
+      if (videoPlaceholder) {
+        videoPlaceholder.style.display = "none";
+      }
+      // Ensure video plays when loaded - try multiple times
+      const attemptPlay = () => {
+        if (video && video.readyState >= 2) {
+          // Ensure muted for autoplay
+          video.muted = true;
+          video.play().catch(err => {
+            console.log("Video autoplay prevented:", err);
+            // Retry after a short delay
+            trackedSetTimeout(() => {
+              if (video && video.readyState >= 2) {
+                video.play().catch(() => {});
+              }
+            }, 200);
+          });
+        } else {
+          // Wait a bit and try again
+          trackedSetTimeout(attemptPlay, 100);
+        }
+      };
+      attemptPlay();
+    };
+    
+    video.addEventListener("loadeddata", playVideoWhenReady);
+    video.addEventListener("canplay", playVideoWhenReady, { once: true });
+    video.addEventListener("canplaythrough", playVideoWhenReady, { once: true });
+    
     // Completely disable context menu (right-click menu)
     video.addEventListener("contextmenu", (e) => {
       e.preventDefault();
@@ -452,6 +955,32 @@ document.addEventListener("DOMContentLoaded", () => {
         video.controlsList.add("nofullscreen");
         video.controlsList.add("noremoteplayback");
       }
+      // Hide placeholder when metadata loads
+      if (videoPlaceholder) {
+        videoPlaceholder.style.display = "none";
+      }
+      video.style.display = "block";
+      // Ensure video plays when metadata is loaded - try multiple times
+      const attemptPlayFromMetadata = () => {
+        if (video && video.readyState >= 1) {
+          // Ensure muted for autoplay
+          video.muted = true;
+          video.play().catch(err => {
+            console.log("Video autoplay prevented (metadata):", err);
+            // Try again after a short delay
+            trackedSetTimeout(() => {
+              if (video && video.readyState >= 2) {
+                video.muted = true;
+                video.play().catch(() => {});
+              }
+            }, 200);
+          });
+        } else {
+          // Wait for more data
+          trackedSetTimeout(attemptPlayFromMetadata, 100);
+        }
+      };
+      attemptPlayFromMetadata();
     });
     
     // Unmute and set max volume once video can play

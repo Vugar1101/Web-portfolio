@@ -50,7 +50,7 @@ img {
 
 /* Wrapper utility */
 .wrapper {
-  max-width: 850px;
+  max-width: 820px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 1.5rem;
@@ -458,6 +458,12 @@ p {
   transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
+/* Ensure video can load even when hidden (for initial page load) */
+.site-header .site-header__video video {
+  /* Allow video to load in background even if parent is hidden */
+  display: block;
+}
+
 .site-header.site-header--compact .site-tagline {
   opacity: 0;
   max-height: 0;
@@ -636,24 +642,31 @@ body.page-home .site-header .site-header__video {
 .site-header .site-brand__eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  font-size: 0.75rem;
+  font-size: 0.70rem;
   margin: 0 0 0.25rem;
-  margin-top: 5.5cm;
+  margin-top: 2.5cm;
+  position: relative;
+  top: 2.5cm;
   color: rgba(255, 255, 255, 0.7);
 }
 
 .site-header .site-title {
   display: block;
+  line-height: 1.2;
   font-size: clamp(1.5rem, calc(2vw + 1rem), 2.5rem);
   font-weight: 700;
   color: #ffffff;
   text-decoration: none;
-  margin-bottom: 5cm;
+  margin-top: 2.5cm;
+  position: relative;
+  transform: translateY(0.3cm);
+  margin-bottom: 3.5cm;
   width: 100%;
 }
 
 .site-header .site-brand__welcome {
-  margin: 0.5rem 0;
+  margin-top: 2.5cm;
+  margin-left: 1cm;
   display: inline-block;
 }
 
@@ -680,8 +693,9 @@ body.page-home .site-header .site-header__video {
 }
 
 .site-header .site-tagline {
-  margin: 1.5rem 0;
+  margin: 1.5rem 1cm;
   max-width: 32rem;
+  max-height: 16rem;
   color: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
   line-height: 1.6;
