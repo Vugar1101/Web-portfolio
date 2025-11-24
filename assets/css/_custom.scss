@@ -170,7 +170,7 @@ p {
     }
 
     .site-title {
-      font-size: clamp(1.2rem, 1.5vw + 0.8rem, 1.8rem);
+      font-size: clamp(1.2rem, calc(1.5vw + 0.8rem), 1.8rem);
       margin-top: 5cm;
       display: block;
       width: 100%;
