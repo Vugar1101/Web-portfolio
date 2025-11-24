@@ -156,6 +156,14 @@ document.addEventListener("DOMContentLoaded", () => {
         // Update page content
         pageContent.innerHTML = newContent.innerHTML;
         
+        // Update body class based on page type
+        const isHomePage = href === "/" || href === "/index.html" || href.endsWith("/") || href.includes("/index");
+        if (isHomePage) {
+          document.body.className = "page-home";
+        } else {
+          document.body.className = "page-content-page";
+        }
+        
         // Automatically add data-reveal to new content sections
         autoAddReveal();
         
@@ -271,6 +279,14 @@ document.addEventListener("DOMContentLoaded", () => {
         
         if (newContent) {
           pageContent.innerHTML = newContent.innerHTML;
+          
+          // Update body class based on page type
+          const isHomePage = currentPath === "/" || currentPath === "/index.html" || currentPath.endsWith("/") || currentPath.includes("/index");
+          if (isHomePage) {
+            document.body.className = "page-home";
+          } else {
+            document.body.className = "page-content-page";
+          }
           
           // Automatically add data-reveal to new content sections
           autoAddReveal();
