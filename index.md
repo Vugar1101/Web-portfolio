@@ -4,10 +4,11 @@
 
 layout: home
 title: Home
+permalink: /home/
 ---
 
 <section class="home-hero" data-reveal>
-  <img class="home-hero__photo" src="https://media.licdn.com/dms/image/v2/D4E03AQEovAxDs7TBSw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1711617735078?e=1765411200&v=beta&t=DEAnW9VoofvQoTD56bgEzRk7kIVnjV9zXVeMLaI8uo0" alt="Portrait of Vugar Mirza" />
+  <img class="home-hero__photo" src="{{ '/assets/img/portrait.jpg' | relative_url }}" alt="Portrait of Vugar Mirza" loading="eager" decoding="async" />
   <div class="home-hero__content">
     <h1>Hi, I’m Vugar Mirza</h1>
     <p>

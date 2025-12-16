@@ -133,10 +133,119 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("beforeunload", cleanup);
   window.addEventListener("unload", cleanup);
   
+  // Footer is now shown on home page - no removal needed
+  
+  // Remove duplicate navigation bars from home page
+  const removeDuplicateNav = () => {
+    if (!document.body.classList.contains("page-home")) return;
+    
+    const headerInner = document.querySelector(".site-header__inner");
+    if (!headerInner) return;
+    
+    // Find the correct navigation inside header__inner
+    const correctNav = headerInner.querySelector(".site-nav--pill");
+    
+    // Find ALL navigation elements in the entire document
+    const allNavElements = document.querySelectorAll(".site-nav--pill");
+    
+    // Remove all navigation elements except the one inside header__inner
+    allNavElements.forEach((nav) => {
+      const isInsideHeaderInner = headerInner.contains(nav);
+      if (!isInsideHeaderInner) {
+        // Navigation is outside header__inner, completely remove it
+        console.log("Removing duplicate navigation outside header:", nav);
+        nav.remove();
+      } else if (nav !== correctNav && correctNav) {
+        // Multiple navs inside header__inner, keep only the first one
+        console.log("Removing duplicate navigation inside header:", nav);
+        nav.remove();
+      }
+    });
+    
+    // Also check for navigation in wrong positions and remove them
+    const navsAfterHeader = document.querySelectorAll(".site-header ~ .site-nav--pill, .site-header ~ * .site-nav--pill");
+    navsAfterHeader.forEach(nav => {
+      console.log("Removing navigation after header:", nav);
+      nav.remove();
+    });
+    
+    // Check for navigation in page-content and remove it
+    const pageContent = document.querySelector(".page-content");
+    if (pageContent) {
+      const navsInContent = pageContent.querySelectorAll(".site-nav--pill");
+      navsInContent.forEach(nav => {
+        console.log("Removing navigation in page-content:", nav);
+        nav.remove();
+      });
+    }
+  };
+  
+  // Remove duplicate navigation and footer on initial load and after delays
+  const removeDuplicateFooter = () => {
+    if (!document.body.classList.contains("page-home")) return;
+    
+    // Find the main footer (should be outside page-content)
+    const mainFooter = document.querySelector("body > .site-footer, body > footer.site-footer");
+    
+    // Find ALL footer elements
+    const allFooters = document.querySelectorAll(".site-footer");
+    
+    // Remove footers that are inside page-content
+    allFooters.forEach((footer) => {
+      const pageContent = document.querySelector(".page-content");
+      if (pageContent && pageContent.contains(footer)) {
+        console.log("Removing duplicate footer in page-content:", footer);
+        footer.remove();
+      }
+    });
+  };
+  
+  removeDuplicateNav();
+  removeDuplicateFooter();
+  trackedSetTimeout(() => {
+    removeDuplicateNav();
+    removeDuplicateFooter();
+  }, 50);
+  trackedSetTimeout(() => {
+    removeDuplicateNav();
+    removeDuplicateFooter();
+  }, 150);
+  trackedSetTimeout(() => {
+    removeDuplicateNav();
+    removeDuplicateFooter();
+  }, 300);
+  
   // Run auto-add reveal on initial load
   autoAddReveal();
   
   const revealTargets = document.querySelectorAll("[data-reveal]");
+
+  // Helper function to normalize path by removing baseurl
+  // Baseurl is typically /Web-portfolio for GitHub Pages
+  const normalizePath = (path) => {
+    if (!path) return "/";
+    // Remove leading/trailing slashes and normalize
+    let normalized = path.replace(/^\/+|\/+$/g, "");
+    // Remove baseurl if present (/Web-portfolio)
+    if (normalized.startsWith("Web-portfolio")) {
+      normalized = normalized.replace(/^Web-portfolio\/?/, "");
+    }
+    // Return with leading slash, or "/" if empty
+    return normalized ? "/" + normalized : "/";
+  };
+
+  // Helper function to detect page type from path
+  const detectPageType = (path) => {
+    const normalized = normalizePath(path);
+    // Welcome page: root path "/" or "/welcome"
+    const isWelcomePage = normalized === "/" || 
+                         normalized === "/welcome" || 
+                         normalized.endsWith("/welcome");
+    // Home page: "/home"
+    const isHomePage = normalized === "/home" || 
+                      normalized.endsWith("/home");
+    return { isWelcomePage, isHomePage };
+  };
 
   // SPA-style navigation without page reload for all navigation links
   const handleNavClick = async (e) => {
@@ -194,9 +303,161 @@ document.addEventListener("DOMContentLoaded", () => {
         // Update page content
         pageContent.innerHTML = newContent.innerHTML;
         
+        // Remove duplicate navigation and footer after content update
+        if (document.body.classList.contains("page-home")) {
+          trackedSetTimeout(() => {
+            removeDuplicateNav();
+            removeDuplicateFooter();
+          }, 50);
+          trackedSetTimeout(() => {
+            removeDuplicateNav();
+            removeDuplicateFooter();
+          }, 150);
+        }
+        
         // Update body class based on page type
-        const isHomePage = href === "/" || href === "/index.html" || href.endsWith("/") || href.includes("/index");
-        if (isHomePage) {
+        const { isWelcomePage, isHomePage } = detectPageType(href);
+        if (isWelcomePage) {
+          document.body.className = "page-welcome";
+          
+          // Remove compact mode to ensure header elements are visible
+          if (header && header.classList.contains("site-header--compact")) {
+            header.classList.remove("site-header--compact");
+          }
+          
+          // Force header elements to be visible immediately
+          trackedSetTimeout(() => {
+            const brand = document.querySelector(".site-header .site-brand");
+            const video = document.querySelector(".site-header .site-header__video");
+            const nav = document.querySelector(".site-header .site-nav--pill");
+            
+            if (brand) {
+              brand.style.display = "block";
+              brand.style.opacity = "1";
+              brand.style.visibility = "visible";
+            }
+            if (video) {
+              video.style.display = "flex";
+              video.style.opacity = "1";
+              video.style.visibility = "visible";
+            }
+            if (nav) {
+              nav.style.display = "block";
+              nav.style.opacity = "1";
+              nav.style.visibility = "visible";
+            }
+            const marquee = document.querySelector(".site-marquee");
+            if (marquee) {
+              marquee.style.display = "block";
+            }
+          }, 50);
+          
+          // Reinitialize video when returning to welcome page
+          const welcomeVideo = document.querySelector(".site-header__video video");
+          const videoContainer = welcomeVideo ? welcomeVideo.closest(".site-header__video") : null;
+          const placeholder = videoContainer ? videoContainer.querySelector(".video-placeholder") : null;
+          
+          if (welcomeVideo) {
+            // Reset video loaded state to allow it to reload
+            videoLoaded = false;
+            
+            // Ensure video container is visible (not in compact mode)
+            if (header && header.classList.contains("site-header--compact")) {
+              header.classList.remove("site-header--compact");
+            }
+            
+            // Ensure video is visible and placeholder is hidden
+            welcomeVideo.style.display = "block";
+            welcomeVideo.style.visibility = "visible";
+            if (placeholder) {
+              placeholder.style.display = "none";
+            }
+            
+            // Set preload to auto if not already set
+            if (welcomeVideo.getAttribute("preload") !== "auto") {
+              welcomeVideo.setAttribute("preload", "auto");
+            }
+            
+            // Set up error handler
+            let errorHandled = false;
+            let errorTimeout;
+            const handleVideoError = () => {
+              if (errorHandled) return;
+              if (errorTimeout) {
+                clearTimeout(errorTimeout);
+                const index = activeTimeouts.indexOf(errorTimeout);
+                if (index > -1) activeTimeouts.splice(index, 1);
+              }
+              
+              errorTimeout = trackedSetTimeout(() => {
+                if (welcomeVideo && welcomeVideo.error && welcomeVideo.error.code !== 0) {
+                  errorHandled = true;
+                  welcomeVideo.style.display = "none";
+                  if (placeholder) {
+                    placeholder.style.display = "flex";
+                  }
+                }
+              }, 3000);
+            };
+            
+            const navErrorController = new AbortController();
+            abortControllers.push(navErrorController);
+            welcomeVideo.addEventListener("error", handleVideoError, { 
+              once: false,
+              signal: navErrorController.signal
+            });
+            
+            // Hide placeholder when video loads successfully
+            const hidePlaceholder = () => {
+              if (errorTimeout) {
+                clearTimeout(errorTimeout);
+                const index = activeTimeouts.indexOf(errorTimeout);
+                if (index > -1) activeTimeouts.splice(index, 1);
+              }
+              errorHandled = false;
+              videoLoaded = true;
+              if (welcomeVideo) {
+                welcomeVideo.style.display = "block";
+                welcomeVideo.style.visibility = "visible";
+              }
+              if (placeholder) {
+                placeholder.style.display = "none";
+              }
+            };
+            
+            welcomeVideo.addEventListener("loadeddata", hidePlaceholder, { once: true });
+            welcomeVideo.addEventListener("canplay", hidePlaceholder, { once: true });
+            welcomeVideo.addEventListener("loadedmetadata", hidePlaceholder, { once: true });
+            
+            // Check if video is ready
+            if (welcomeVideo.readyState >= 2) {
+              videoLoaded = true;
+              // Ensure video plays
+              welcomeVideo.play().catch(err => {
+                console.log("Video autoplay prevented:", err);
+              });
+            } else {
+              // Force video to reload
+              welcomeVideo.load();
+              
+              // Retry if needed
+              trackedSetTimeout(() => {
+                if (welcomeVideo && welcomeVideo.readyState === 0) {
+                  welcomeVideo.load();
+                }
+              }, 100);
+              
+              // Try to play when video is ready
+              const tryPlay = () => {
+                welcomeVideo.play().catch(err => {
+                  console.log("Video autoplay prevented:", err);
+                });
+              };
+              welcomeVideo.addEventListener("canplay", tryPlay, { once: true });
+              welcomeVideo.addEventListener("loadeddata", tryPlay, { once: true });
+            }
+          }
+        } else if (isHomePage) {
           document.body.className = "page-home";
           
           // Reinitialize video when returning to home page
@@ -440,9 +701,101 @@ document.addEventListener("DOMContentLoaded", () => {
         if (newContent) {
           pageContent.innerHTML = newContent.innerHTML;
           
+          // Remove duplicate navigation and footer after content update
+          if (document.body.classList.contains("page-home")) {
+            trackedSetTimeout(() => {
+              removeDuplicateNav();
+              removeDuplicateFooter();
+            }, 50);
+            trackedSetTimeout(() => {
+              removeDuplicateNav();
+              removeDuplicateFooter();
+            }, 150);
+          }
+          
           // Update body class based on page type
-          const isHomePage = currentPath === "/" || currentPath === "/index.html" || currentPath.endsWith("/") || currentPath.includes("/index");
-          if (isHomePage) {
+          const { isWelcomePage, isHomePage } = detectPageType(currentPath);
+          if (isWelcomePage) {
+            document.body.className = "page-welcome";
+            
+            // Remove compact mode to ensure header elements are visible
+            if (header && header.classList.contains("site-header--compact")) {
+              header.classList.remove("site-header--compact");
+            }
+            
+            // Force header elements to be visible immediately
+            trackedSetTimeout(() => {
+              const brand = document.querySelector(".site-header .site-brand");
+              const video = document.querySelector(".site-header .site-header__video");
+              const nav = document.querySelector(".site-header .site-nav--pill");
+              
+              if (brand) {
+                brand.style.display = "block";
+                brand.style.opacity = "1";
+                brand.style.visibility = "visible";
+              }
+              if (video) {
+                video.style.display = "flex";
+                video.style.opacity = "1";
+                video.style.visibility = "visible";
+              }
+              if (nav) {
+                nav.style.display = "block";
+                nav.style.opacity = "1";
+                nav.style.visibility = "visible";
+              }
+              const marquee = document.querySelector(".site-marquee");
+              if (marquee) {
+                marquee.style.display = "block";
+              }
+            }, 50);
+            
+            // Reinitialize video when returning to welcome page
+            const welcomeVideo = document.querySelector(".site-header__video video");
+            const videoContainer = welcomeVideo ? welcomeVideo.closest(".site-header__video") : null;
+            const placeholder = videoContainer ? videoContainer.querySelector(".video-placeholder") : null;
+            
+            if (welcomeVideo) {
+              // Reset video loaded state to allow it to reload
+              videoLoaded = false;
+              
+              // Ensure video container is visible (not in compact mode)
+              if (header && header.classList.contains("site-header--compact")) {
+                header.classList.remove("site-header--compact");
+              }
+              
+              // Ensure video is visible and placeholder is hidden
+              welcomeVideo.style.display = "block";
+              welcomeVideo.style.visibility = "visible";
+              if (placeholder) {
+                placeholder.style.display = "none";
+              }
+              
+              // Set preload to auto if not already set
+              if (welcomeVideo.getAttribute("preload") !== "auto") {
+                welcomeVideo.setAttribute("preload", "auto");
+              }
+              
+              // Force video to reload
+              welcomeVideo.load();
+              
+              // Retry if needed
+              trackedSetTimeout(() => {
+                if (welcomeVideo && welcomeVideo.readyState === 0) {
+                  welcomeVideo.load();
+                }
+              }, 100);
+              
+              // Try to play when video is ready
+              const tryPlay = () => {
+                welcomeVideo.play().catch(err => {
+                  console.log("Video autoplay prevented:", err);
+                });
+              };
+              welcomeVideo.addEventListener("canplay", tryPlay, { once: true });
+              welcomeVideo.addEventListener("loadeddata", tryPlay, { once: true });
+            }
+          } else if (isHomePage) {
             document.body.className = "page-home";
           } else {
             document.body.className = "page-content-page";
@@ -568,6 +921,110 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize: Check if video is already loaded
   const headerVideo = document.querySelector(".site-header__video video");
   const isHomePageOnLoad = document.body.classList.contains("page-home");
+  const isWelcomePageOnLoad = document.body.classList.contains("page-welcome");
+  
+  // Initialize video on welcome page (initial load)
+  if (headerVideo && isWelcomePageOnLoad) {
+    // On welcome page, ensure video starts loading
+    const videoContainer = headerVideo.closest(".site-header__video");
+    const placeholder = videoContainer ? videoContainer.querySelector(".video-placeholder") : null;
+    
+    // Ensure video container is visible (not in compact mode)
+    if (header && header.classList.contains("site-header--compact")) {
+      header.classList.remove("site-header--compact");
+    }
+    
+    // Ensure video is visible and placeholder is hidden
+    headerVideo.style.display = "block";
+    headerVideo.style.visibility = "visible";
+    if (placeholder) {
+      placeholder.style.display = "none";
+    }
+    
+    // Set preload to auto if not already set
+    if (headerVideo.getAttribute("preload") !== "auto") {
+      headerVideo.setAttribute("preload", "auto");
+    }
+    
+    // Set up error handler
+    let errorHandled = false;
+    let errorTimeout;
+    const handleVideoError = () => {
+      if (errorHandled) return;
+      if (errorTimeout) {
+        clearTimeout(errorTimeout);
+        const index = activeTimeouts.indexOf(errorTimeout);
+        if (index > -1) activeTimeouts.splice(index, 1);
+      }
+      
+      errorTimeout = trackedSetTimeout(() => {
+        if (headerVideo && headerVideo.error && headerVideo.error.code !== 0) {
+          errorHandled = true;
+          headerVideo.style.display = "none";
+          if (placeholder) {
+            placeholder.style.display = "flex";
+          }
+        }
+      }, 3000);
+    };
+    
+    const welcomeErrorController = new AbortController();
+    abortControllers.push(welcomeErrorController);
+    headerVideo.addEventListener("error", handleVideoError, { 
+      once: false,
+      signal: welcomeErrorController.signal
+    });
+    
+    // Hide placeholder when video loads successfully
+    const hidePlaceholder = () => {
+      if (errorTimeout) {
+        clearTimeout(errorTimeout);
+        const index = activeTimeouts.indexOf(errorTimeout);
+        if (index > -1) activeTimeouts.splice(index, 1);
+      }
+      errorHandled = false;
+      videoLoaded = true;
+      if (headerVideo) {
+        headerVideo.style.display = "block";
+        headerVideo.style.visibility = "visible";
+      }
+      if (placeholder) {
+        placeholder.style.display = "none";
+      }
+    };
+    
+    headerVideo.addEventListener("loadeddata", hidePlaceholder, { once: true });
+    headerVideo.addEventListener("canplay", hidePlaceholder, { once: true });
+    headerVideo.addEventListener("loadedmetadata", hidePlaceholder, { once: true });
+    
+    // Check if video is ready
+    if (headerVideo.readyState >= 2) {
+      videoLoaded = true;
+      // Ensure video plays
+      headerVideo.play().catch(err => {
+        console.log("Video autoplay prevented:", err);
+      });
+    } else {
+      // Force video to reload
+      headerVideo.load();
+      
+      // Retry if needed
+      trackedSetTimeout(() => {
+        if (headerVideo && headerVideo.readyState === 0) {
+          headerVideo.load();
+        }
+      }, 100);
+      
+      // Try to play when video is ready
+      const tryPlay = () => {
+        headerVideo.play().catch(err => {
+          console.log("Video autoplay prevented:", err);
+        });
+      };
+      headerVideo.addEventListener("canplay", tryPlay, { once: true });
+      headerVideo.addEventListener("loadeddata", tryPlay, { once: true });
+    }
+  }
   
   if (headerVideo && isHomePageOnLoad) {
     // On home page, ensure video starts loading

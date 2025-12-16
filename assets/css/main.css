@@ -377,7 +377,7 @@ a:focus {
 }
 
 .page-content .wrapper {
-  background: rgba(4, 245, 161, 0.15);
+  background: transparent;
   box-shadow: none;
   border-radius: 24px;
   padding: clamp(2.5rem, 2vw, 5rem) clamp(1.5rem, 3vw, 3rem) clamp(1.5rem, 3vw, 3rem);
@@ -531,27 +531,137 @@ body.page-content-page .site-marquee {
   display: none;
 }
 
-/* Home page specific styles - restore original sizing */
-body.page-home .site-header .site-brand {
+/* Welcome page - show all header elements (video, brand, marquee, navigation) */
+body.page-welcome .site-header .site-header__inner {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  position: relative;
+}
+
+body.page-welcome .site-header .site-brand {
   justify-self: start;
   grid-column: 1;
   margin-left: -350px;
   padding-left: 0;
   margin-top: calc(-350px + 3cm);
   transition: opacity 0.3s ease, visibility 0.3s ease;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
-body.page-home .site-header .site-header__video {
+body.page-welcome .site-header .site-header__video {
   grid-column: 2;
   justify-self: center;
   width: 100%;
   max-width: 600px;
   min-height: 600px;
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   transition: opacity 0.3s ease, visibility 0.3s ease;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
+
+body.page-welcome .site-header .site-nav--pill {
+  grid-column: 3;
+  justify-self: end;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+body.page-welcome .site-marquee {
+  display: block !important;
+}
+
+/* Hide video and brand on home page - only show navigation */
+body.page-home .site-header .site-brand,
+body.page-home .site-header .site-header__video {
+  display: none !important;
+}
+
+body.page-home .site-header .site-header__inner {
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
+
+body.page-home .site-header .site-nav--pill {
+  grid-column: 1;
+  justify-self: center;
+  margin-right: 0;
+  width: auto;
+}
+
+body.page-home .site-header .site-nav--pill .trigger {
+  flex-direction: row;
+  gap: 0.75rem;
+  width: auto;
+}
+
+body.page-home .site-header {
+ padding: 0.5rem 0 0 0;
+ margin: 0;
+ background: transparent;
+ border-top: none;
+ min-height: 0;
+ height: auto;
+}
+
+body.page-home .site-header .site-header__inner {
+ padding-bottom: 0;
+ margin-bottom: 0;
+}
+
+body.page-home .site-marquee {
+  display: none;
+}
+
+/* Hide duplicate navigation bars that appear outside the header (below it) */
+body.page-home .site-header ~ .site-nav--pill,
+body.page-home .site-header ~ * .site-nav--pill,
+body.page-home .page-content .site-nav--pill,
+body.page-home .page-content .wrapper .site-nav--pill {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Hide duplicate footer in content area on home page */
+body.page-home .page-content .site-footer,
+body.page-home .page-content .wrapper .site-footer,
+body.page-home .page-content .wrapper ~ .site-footer {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Restore wrapper styling on home page */
+body.page-home .page-content .wrapper {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 24px;
+  padding: clamp(2.5rem, 2vw, 5rem) clamp(1.5rem, 3vw, 3rem) clamp(1.5rem, 3vw, 3rem);
+  backdrop-filter: none;
+  position: relative;
+  z-index: 10;
+}
+
+/* Home page specific styles - brand and video are hidden, so no conflicting display rules needed */
 
 .site-header .site-header__video video {
   width: 100%;
