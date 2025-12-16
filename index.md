@@ -23,8 +23,8 @@ permalink: /home/
       <li>🌍 Community workshops championing digital literacy</li>
     </ul>
     <p class="home-hero__cta">
-      <a href="/projects/" class="btn">View Projects</a>
-      <a href="/resume/" class="btn btn--ghost">Resume</a>
+      <a href="{{ '/projects/' | relative_url }}" class="btn">View Projects</a>
+      <a href="{{ site.resume_pdf | default: '/assets/pdf/resume.pdf' | relative_url }}" class="btn btn--ghost" target="_blank" rel="noopener noreferrer">Resume</a>
     </p>
   </div>
 </section>
