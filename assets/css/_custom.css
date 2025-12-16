@@ -44,7 +44,7 @@ body {
   align-items: center;
   white-space: nowrap;
   gap: 4rem;
-  animation: marquee-scroll 18s linear infinite;
+  animation: marquee-scroll 12s linear infinite;
 }
 
 .site-marquee__quote {

@@ -340,7 +340,7 @@ body {
   align-items: center;
   white-space: nowrap;
   gap: 4rem;
-  animation: marquee-scroll 18s linear infinite;
+  animation: marquee-scroll 12s linear infinite;
 }
 
 .site-marquee__quote {
@@ -1103,6 +1103,9 @@ body.page-home .page-content .wrapper {
     gap: 1rem;
     padding: 1rem;
     width: 100%;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center;
   }
   
   body.page-welcome .site-header .site-brand {
@@ -1141,13 +1144,33 @@ body.page-home .page-content .wrapper {
     -webkit-touch-callout: none;
   }
   
+  /* Move navigation below video on mobile - don't overlap */
+  body.page-welcome .site-header .site-header__inner {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem;
+    align-items: center;
+  }
+  
+  body.page-welcome .site-header .site-brand {
+    order: 1;
+    width: 100%;
+  }
+  
+  body.page-welcome .site-header .site-header__video {
+    order: 2;
+    width: 100%;
+    margin: 0;
+  }
+  
   body.page-welcome .site-header .site-nav--pill {
+    order: 3;
     grid-column: 1 !important;
     justify-self: center;
     width: 100%;
     position: relative;
-    z-index: 1000;
-    margin: 1rem 0;
+    z-index: 1;
+    margin: 1rem 0 0 0;
   }
   
   /* Navigation adjustments */
@@ -1449,13 +1472,15 @@ body.page-home .page-content .wrapper {
     font-size: 0.85rem;
   }
   
-  /* Marquee mobile - fix overlapping text */
+  /* Marquee mobile - fix overlapping text and increase speed */
   .site-marquee {
     overflow: hidden !important;
     white-space: nowrap !important;
     width: 100%;
     max-width: 100%;
     position: relative;
+    height: auto;
+    min-height: 2.5rem;
   }
   
   .site-marquee .wrapper {
@@ -1463,23 +1488,35 @@ body.page-home .page-content .wrapper {
     overflow: hidden;
     width: 100%;
     max-width: 100%;
+    height: 100%;
   }
   
   .site-marquee__inner {
-    gap: 4rem !important;
+    gap: 3rem !important;
     white-space: nowrap !important;
     display: inline-flex !important;
     align-items: center;
     will-change: transform;
+    animation: marquee-scroll 10s linear infinite !important;
   }
   
   .site-marquee__quote {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     white-space: nowrap !important;
     display: inline-block !important;
-    padding: 0 2rem;
+    padding: 0 2.5rem;
     flex-shrink: 0;
     min-width: max-content;
+    line-height: 1.4;
+  }
+  
+  @keyframes marquee-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
   }
   
   /* Wrapper mobile padding */
