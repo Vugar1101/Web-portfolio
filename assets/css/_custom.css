@@ -254,9 +254,11 @@ p {
   background: rgba(255, 255, 255, 0.05);
   border: 2px dashed rgba(255, 255, 255, 0.2);
   border-radius: 12px;
-  display: flex;
+  display: none !important;
   align-items: center;
   justify-content: center;
+  visibility: hidden;
+  opacity: 0;
 }
 
 .site-header .site-header__video .video-placeholder-content {
@@ -440,7 +442,8 @@ p {
     gap: 1rem;
   }
 
-  .site-header__video {
+  /* Only hide video on non-welcome pages */
+  body:not(.page-welcome) .site-header__video {
     display: none;
   }
 

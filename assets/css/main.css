@@ -670,6 +670,9 @@ body.page-home .page-content .wrapper {
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   background: rgba(0, 0, 0, 0.3);
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* Hide unwanted video controls (fullscreen, download, etc.) */
@@ -705,9 +708,11 @@ body.page-home .page-content .wrapper {
   background: rgba(255, 255, 255, 0.05);
   border: 2px dashed rgba(255, 255, 255, 0.2);
   border-radius: 12px;
-  display: flex;
+  display: none !important;
   align-items: center;
   justify-content: center;
+  visibility: hidden;
+  opacity: 0;
 }
 
 .site-header .site-header__video .video-placeholder-content {
@@ -1059,65 +1064,85 @@ body.page-home .page-content .wrapper {
 
 /* Tablet styles (768px and below) */
 @media (max-width: 768px) {
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+  
   /* Header adjustments */
   body.page-welcome .site-header .site-header__inner {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     gap: 1rem;
-    padding: 1rem 0;
+    padding: 1rem;
+    width: 100%;
   }
   
   body.page-welcome .site-header .site-brand {
-    grid-column: 1;
+    grid-column: 1 !important;
     justify-self: center;
-    margin-left: 0;
-    margin-top: 0;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
     padding-left: 0;
+    text-align: center;
   }
   
   body.page-welcome .site-header .site-header__video {
-    grid-column: 1;
+    grid-column: 1 !important;
     max-width: 100%;
-    min-height: 400px;
+    width: 100%;
+    min-height: 350px;
     display: flex !important;
+    justify-self: center;
   }
   
   body.page-welcome .site-header .site-header__video video {
     width: 100%;
     max-width: 100%;
+    height: auto;
   }
   
   body.page-welcome .site-header .site-nav--pill {
-    grid-column: 1;
+    grid-column: 1 !important;
     justify-self: center;
-  }
-  
-  /* Ensure video is visible on welcome page even at 700px breakpoint */
-  @media (max-width: 700px) {
-    body.page-welcome .site-header__video {
-      display: flex !important;
-    }
+    width: 100%;
   }
   
   /* Navigation adjustments */
   .site-nav--pill .trigger {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     gap: 0.5rem;
+    justify-content: center;
+  }
+  
+  .site-nav--pill .page-link {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
   }
   
   /* Video adjustments */
+  .site-header .site-header__video {
+    max-width: 100%;
+    width: 100%;
+  }
+  
   .site-header .site-header__video video {
     max-width: 100%;
+    width: 100%;
+    height: auto;
   }
   
   /* Home hero adjustments */
   .home-hero {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+    padding: 0 1rem;
   }
   
   .home-hero__photo {
     order: 1;
-    max-width: 300px;
+    max-width: 100%;
+    width: 100%;
     margin: 0 auto;
   }
   
@@ -1130,6 +1155,7 @@ body.page-home .page-content .wrapper {
   .social-links {
     justify-content: center;
     gap: 0.75rem;
+    flex-wrap: wrap;
   }
   
   .social-links svg {
@@ -1142,16 +1168,30 @@ body.page-home .page-content .wrapper {
     grid-template-columns: 1fr;
     gap: 1.5rem;
     text-align: center;
+    padding: 0 1rem;
   }
   
   /* Wrapper padding */
   .page-content .wrapper {
     padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem);
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  /* Marquee adjustments */
+  .site-marquee {
+    font-size: 0.8rem;
   }
 }
 
 /* Mobile styles (480px and below) */
 @media (max-width: 480px) {
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+  
   /* Typography scaling */
   html {
     font-size: 14px;
@@ -1163,39 +1203,62 @@ body.page-home .page-content .wrapper {
   }
   
   body.page-welcome .site-header .site-header__video {
-    min-height: 300px;
+    min-height: 250px;
+    max-height: 300px;
+  }
+  
+  body.page-welcome .site-header .site-header__video video {
+    height: auto;
+    max-height: 100%;
   }
   
   /* Brand adjustments */
   .site-header .site-brand {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    text-align: center;
   }
   
   .site-header .site-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
+    word-wrap: break-word;
   }
   
   .site-header .site-tagline {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    line-height: 1.4;
   }
   
   /* Navigation mobile menu */
   .site-nav--pill {
     width: 100%;
+    max-width: 100%;
   }
   
   .site-nav--pill .trigger {
     flex-wrap: wrap;
     justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .site-nav--pill .page-link {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
   }
   
   /* Home hero mobile */
+  .home-hero {
+    margin: 0 0 2rem;
+  }
+  
   .home-hero__content h1 {
-    font-size: clamp(1.5rem, 5vw, 2rem);
+    font-size: clamp(1.5rem, 6vw, 2rem);
+    line-height: 1.3;
   }
   
   .home-hero__photo {
     max-width: 100%;
+    width: 100%;
   }
   
   /* Buttons mobile */
@@ -1204,9 +1267,21 @@ body.page-home .page-content .wrapper {
     width: 100%;
     margin: 0.5rem 0;
     text-align: center;
+    padding: 0.75rem 1.5rem;
+  }
+  
+  .home-hero__cta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
   
   /* Social icons smaller on mobile */
+  .social-links {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
   .social-links svg {
     width: 28px;
     height: 28px;
@@ -1218,23 +1293,46 @@ body.page-home .page-content .wrapper {
   }
   
   .site-footer .footer-heading {
-    font-size: 1.1rem;
+    font-size: 1rem;
+  }
+  
+  .site-footer .contact-list {
+    text-align: center;
+  }
+  
+  .site-footer .u-email {
+    word-break: break-all;
+    font-size: 0.85rem;
   }
   
   /* Marquee mobile */
   .site-marquee__quote {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
   }
   
   /* Wrapper mobile padding */
   .wrapper {
     padding-left: 1rem;
     padding-right: 1rem;
+    max-width: 100%;
   }
   
   .page-content .wrapper {
     padding: clamp(1rem, 4vw, 2rem) 1rem;
     border-radius: 16px;
+    margin: 0 auto;
+  }
+  
+  /* Ensure all content fits */
+  * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* Fix any overflow issues */
+  .site-header__inner {
+    width: 100%;
+    padding: 0 1rem;
   }
 }
 
@@ -1245,16 +1343,25 @@ body.page-home .page-content .wrapper {
   }
   
   .site-header .site-title {
-    font-size: 1rem;
+    font-size: 0.95rem;
+  }
+  
+  .site-header .site-tagline {
+    font-size: 0.75rem;
   }
   
   .home-hero__content h1 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
   
   .social-links svg {
     width: 24px;
     height: 24px;
+  }
+  
+  .site-nav--pill .page-link {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
   }
 }
 

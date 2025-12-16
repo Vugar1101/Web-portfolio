@@ -987,42 +987,59 @@ document.addEventListener("DOMContentLoaded", () => {
       if (headerVideo) {
         headerVideo.style.display = "block";
         headerVideo.style.visibility = "visible";
+        headerVideo.style.opacity = "1";
       }
       if (placeholder) {
-        placeholder.style.display = "none";
+        placeholder.style.display = "none !important";
+        placeholder.style.visibility = "hidden";
+        placeholder.style.opacity = "0";
       }
     };
     
     headerVideo.addEventListener("loadeddata", hidePlaceholder, { once: true });
     headerVideo.addEventListener("canplay", hidePlaceholder, { once: true });
     headerVideo.addEventListener("loadedmetadata", hidePlaceholder, { once: true });
+    headerVideo.addEventListener("canplaythrough", hidePlaceholder, { once: true });
     
-    // Check if video is ready
+    // Immediately hide placeholder if video is already loaded
     if (headerVideo.readyState >= 2) {
+      hidePlaceholder();
       videoLoaded = true;
       // Ensure video plays
       headerVideo.play().catch(err => {
         console.log("Video autoplay prevented:", err);
       });
     } else {
-      // Force video to reload
+      // Force video to load
       headerVideo.load();
+      
+      // Ensure placeholder is hidden while loading
+      if (placeholder) {
+        placeholder.style.display = "none";
+        placeholder.style.visibility = "hidden";
+      }
       
       // Retry if needed
       trackedSetTimeout(() => {
         if (headerVideo && headerVideo.readyState === 0) {
           headerVideo.load();
         }
-      }, 100);
+        // Check again after load attempt
+        if (headerVideo.readyState >= 2) {
+          hidePlaceholder();
+        }
+      }, 200);
       
       // Try to play when video is ready
       const tryPlay = () => {
+        hidePlaceholder();
         headerVideo.play().catch(err => {
           console.log("Video autoplay prevented:", err);
         });
       };
       headerVideo.addEventListener("canplay", tryPlay, { once: true });
       headerVideo.addEventListener("loadeddata", tryPlay, { once: true });
+      headerVideo.addEventListener("canplaythrough", tryPlay, { once: true });
     }
   }
   
