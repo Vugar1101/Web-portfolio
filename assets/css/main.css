@@ -1052,3 +1052,219 @@ body.page-home .page-content .wrapper {
   padding: 0.5rem !important;
   border-radius: 4px !important;
 }
+
+/* ========================================
+   RESPONSIVE DESIGN - MOBILE & TABLET
+   ======================================== */
+
+/* Tablet styles (768px and below) */
+@media (max-width: 768px) {
+  /* Header adjustments */
+  body.page-welcome .site-header .site-header__inner {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem 0;
+  }
+  
+  body.page-welcome .site-header .site-brand {
+    grid-column: 1;
+    justify-self: center;
+    margin-left: 0;
+    margin-top: 0;
+    padding-left: 0;
+  }
+  
+  body.page-welcome .site-header .site-header__video {
+    grid-column: 1;
+    max-width: 100%;
+    min-height: 400px;
+    display: flex !important;
+  }
+  
+  body.page-welcome .site-header .site-header__video video {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  body.page-welcome .site-header .site-nav--pill {
+    grid-column: 1;
+    justify-self: center;
+  }
+  
+  /* Ensure video is visible on welcome page even at 700px breakpoint */
+  @media (max-width: 700px) {
+    body.page-welcome .site-header__video {
+      display: flex !important;
+    }
+  }
+  
+  /* Navigation adjustments */
+  .site-nav--pill .trigger {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  /* Video adjustments */
+  .site-header .site-header__video video {
+    max-width: 100%;
+  }
+  
+  /* Home hero adjustments */
+  .home-hero {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .home-hero__photo {
+    order: 1;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  
+  .home-hero__content {
+    order: 2;
+    text-align: center;
+  }
+  
+  /* Social links */
+  .social-links {
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  
+  .social-links svg {
+    width: 32px;
+    height: 32px;
+  }
+  
+  /* Footer adjustments */
+  .site-footer .wrapper {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    text-align: center;
+  }
+  
+  /* Wrapper padding */
+  .page-content .wrapper {
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem);
+  }
+}
+
+/* Mobile styles (480px and below) */
+@media (max-width: 480px) {
+  /* Typography scaling */
+  html {
+    font-size: 14px;
+  }
+  
+  /* Header compact on mobile */
+  body.page-welcome .site-header {
+    padding: 0.75rem 0;
+  }
+  
+  body.page-welcome .site-header .site-header__video {
+    min-height: 300px;
+  }
+  
+  /* Brand adjustments */
+  .site-header .site-brand {
+    font-size: 0.9rem;
+  }
+  
+  .site-header .site-title {
+    font-size: 1.1rem;
+  }
+  
+  .site-header .site-tagline {
+    font-size: 0.85rem;
+  }
+  
+  /* Navigation mobile menu */
+  .site-nav--pill {
+    width: 100%;
+  }
+  
+  .site-nav--pill .trigger {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  /* Home hero mobile */
+  .home-hero__content h1 {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+  
+  .home-hero__photo {
+    max-width: 100%;
+  }
+  
+  /* Buttons mobile */
+  .home-hero .btn {
+    display: block;
+    width: 100%;
+    margin: 0.5rem 0;
+    text-align: center;
+  }
+  
+  /* Social icons smaller on mobile */
+  .social-links svg {
+    width: 28px;
+    height: 28px;
+  }
+  
+  /* Footer mobile */
+  .site-footer {
+    padding: 1.5rem 0;
+  }
+  
+  .site-footer .footer-heading {
+    font-size: 1.1rem;
+  }
+  
+  /* Marquee mobile */
+  .site-marquee__quote {
+    font-size: 0.75rem;
+  }
+  
+  /* Wrapper mobile padding */
+  .wrapper {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .page-content .wrapper {
+    padding: clamp(1rem, 4vw, 2rem) 1rem;
+    border-radius: 16px;
+  }
+}
+
+/* Small mobile (360px and below) */
+@media (max-width: 360px) {
+  html {
+    font-size: 13px;
+  }
+  
+  .site-header .site-title {
+    font-size: 1rem;
+  }
+  
+  .home-hero__content h1 {
+    font-size: 1.5rem;
+  }
+  
+  .social-links svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  body.page-welcome .site-header .site-header__video {
+    min-height: 250px;
+  }
+  
+  .home-hero {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
