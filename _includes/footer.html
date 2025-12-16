@@ -15,8 +15,8 @@
               {{ site.title | escape }}
             {%- endif -%}
             </li>
-            {%- if site.email -%}
-            <li><a class="u-email" href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+            {%- if site.github_repo -%}
+            <li><a class="u-email" href="{{ site.github_repo | escape }}" target="_blank" rel="noopener noreferrer">{{ site.github_repo | escape }}</a></li>
             {%- endif -%}
         </ul>
       </div>

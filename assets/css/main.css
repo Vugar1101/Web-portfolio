@@ -93,7 +93,7 @@ img {
 }
 
 .site-footer .u-email {
-  color: #82d4ff;
+  color: #e1ff00;
   text-decoration: none;
 }
 
@@ -528,7 +528,7 @@ body.page-content-page .site-header {
 }
 
 body.page-content-page .site-marquee {
-  display: none;
+  display: block !important;
 }
 
 /* Welcome page - show all header elements (video, brand, marquee, navigation) */
@@ -609,7 +609,7 @@ body.page-home .site-header {
  padding: 0.5rem 0 0 0;
  margin: 0;
  background: transparent;
- border-top: none;
+ border-top: 4px solid #fdf15a;
  min-height: 0;
  height: auto;
 }

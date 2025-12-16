@@ -25,8 +25,10 @@ description: >-
 baseurl: "/Web-portfolio" # the subpath of your site, e.g. /blog (use "" for user pages, "/repository" for project pages)
 url: "https://vugar1101.github.io" # Change this to your GitHub Pages URL
 twitter_username: vugar_codes
-github_username:  vugar-mirza
-linkedin_username: vugar-mirza
+github_username:  Vugar1101
+github_repo: https://github.com/Vugar1101/Web-portfolio
+codecademy_username: VugarMirza
+linkedin_username: vugar-mirzayev-2b4930266
 footer_message: "© 2025 Vugar Mirza. All rights reserved."
 
 header_pages:
