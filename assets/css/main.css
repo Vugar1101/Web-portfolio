@@ -1197,19 +1197,22 @@ body.page-home .page-content .wrapper {
   body.page-welcome .site-header .site-header__inner {
     display: flex !important;
     flex-direction: column !important;
-    gap: 1rem;
+    gap: 1.5rem;
     align-items: center;
+    padding: 1rem;
   }
   
   body.page-welcome .site-header .site-brand {
     order: 1;
     width: 100%;
+    margin-bottom: 0.5rem;
   }
   
   body.page-welcome .site-header .site-header__video {
     order: 2;
     width: 100%;
     margin: 0;
+    margin-bottom: 1rem;
   }
   
   body.page-welcome .site-header .site-nav--pill {
@@ -1219,7 +1222,8 @@ body.page-home .page-content .wrapper {
     width: 100%;
     position: relative;
     z-index: 1;
-    margin: 1rem 0 0 0;
+    margin: 1.5rem 0 0 0;
+    padding-top: 1rem;
   }
   
   /* Navigation adjustments */
@@ -1397,11 +1401,19 @@ body.page-home .page-content .wrapper {
   body.page-welcome .site-header .site-header__video {
     min-height: 250px;
     max-height: 300px;
+    margin-bottom: 1.5rem;
   }
   
   body.page-welcome .site-header .site-header__video video {
     height: auto;
     max-height: 100%;
+  }
+  
+  /* Ensure navigation doesn't overlap video on small mobile */
+  body.page-welcome .site-header .site-nav--pill {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
   
   /* Brand adjustments */
@@ -1521,7 +1533,7 @@ body.page-home .page-content .wrapper {
     font-size: 0.85rem;
   }
   
-  /* Marquee mobile - fix overlapping text and increase speed */
+  /* Marquee mobile - fix overlapping text and ensure full display */
   .site-marquee {
     overflow: hidden !important;
     white-space: nowrap !important;
@@ -1529,34 +1541,45 @@ body.page-home .page-content .wrapper {
     max-width: 100%;
     position: relative;
     height: auto;
-    min-height: 2.5rem;
+    min-height: 3rem;
   }
   
   .site-marquee .wrapper {
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0.5rem;
     overflow: hidden;
     width: 100%;
     max-width: 100%;
     height: 100%;
+    position: relative;
   }
   
   .site-marquee__inner {
-    gap: 3rem !important;
+    gap: 2rem !important;
     white-space: nowrap !important;
     display: inline-flex !important;
     align-items: center;
     will-change: transform;
-    animation: marquee-scroll 10s linear infinite !important;
+    animation: marquee-scroll-mobile 15s linear infinite !important;
+    width: max-content;
   }
   
   .site-marquee__quote {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     white-space: nowrap !important;
     display: inline-block !important;
-    padding: 0 2.5rem;
+    padding: 0 1.5rem;
     flex-shrink: 0;
     min-width: max-content;
-    line-height: 1.4;
+    line-height: 1.5;
+  }
+  
+  @keyframes marquee-scroll-mobile {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
   }
   
   @keyframes marquee-scroll {
