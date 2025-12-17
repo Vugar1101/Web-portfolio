@@ -923,6 +923,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const isHomePageOnLoad = document.body.classList.contains("page-home");
   const isWelcomePageOnLoad = document.body.classList.contains("page-welcome");
   
+  // Track scroll position for hide/show navigation on scroll up
+  let lastScrollY = window.scrollY;
+  let scrollTimeout = null;
+  
+  // Check if current page should have hide-on-scroll-up navigation
+  const shouldHideNavOnScrollUp = () => {
+    return document.body.classList.contains("page-home") ||
+           document.body.classList.contains("page-content-page");
+  };
+  
   // Initialize video on welcome page (initial load)
   if (headerVideo && isWelcomePageOnLoad) {
     // On welcome page, ensure video starts loading
@@ -1260,9 +1270,41 @@ document.addEventListener("DOMContentLoaded", () => {
     
     if (!ticking) {
       window.requestAnimationFrame(() => {
-        const shouldBeCompact = window.scrollY > 50;
+        const currentScrollY = window.scrollY;
+        const shouldBeCompact = currentScrollY > 50;
         const isCompact = header.classList.contains("site-header--compact");
         const isHomePage = document.body.classList.contains("page-home");
+        const isContentPage = document.body.classList.contains("page-content-page");
+        const isWelcomePage = document.body.classList.contains("page-welcome");
+        
+        // Hide navigation bar on scroll up for home, about, resume, projects pages (not welcome)
+        if ((isHomePage || isContentPage) && !isWelcomePage) {
+          const navPill = header.querySelector(".site-nav--pill");
+          const scrollDifference = Math.abs(currentScrollY - lastScrollY);
+          
+          // Only hide/show if scroll difference is significant (more than 5px)
+          if (scrollDifference > 5) {
+            if (currentScrollY < lastScrollY && currentScrollY > 100) {
+              // Scrolling up - hide navigation
+              if (navPill) {
+                navPill.style.transform = "translateY(-100%)";
+                navPill.style.opacity = "0";
+                navPill.style.transition = "transform 0.3s ease, opacity 0.3s ease";
+                navPill.style.pointerEvents = "none";
+              }
+            } else if (currentScrollY > lastScrollY || currentScrollY <= 100) {
+              // Scrolling down or near top - show navigation
+              if (navPill) {
+                navPill.style.transform = "translateY(0)";
+                navPill.style.opacity = "1";
+                navPill.style.transition = "transform 0.3s ease, opacity 0.3s ease";
+                navPill.style.pointerEvents = "auto";
+              }
+            }
+          }
+          
+          lastScrollY = currentScrollY;
+        }
         
         // On home page, only apply compact mode if video has loaded or user has scrolled significantly
         if (isHomePage && headerVideo && !videoLoaded) {
@@ -1271,7 +1313,7 @@ document.addEventListener("DOMContentLoaded", () => {
             videoLoaded = true;
           } else {
             // If video hasn't loaded yet and we're at top, don't hide it
-            if (window.scrollY <= 50) {
+            if (currentScrollY <= 50) {
               ticking = false;
               return;
             }

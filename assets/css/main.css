@@ -148,6 +148,51 @@ img {
   list-style-position: outside;
 }
 
+/* Image styles in page content */
+.page-content img,
+.post-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1.5em auto;
+  border-radius: 8px;
+}
+
+/* Ensure consistent spacing between h2 headings and images */
+.page-content h2 + p img,
+.post-content h2 + p img,
+.page-content h2 + img,
+.post-content h2 + img {
+  margin-top: 1rem;
+  margin-bottom: 1.5em;
+}
+
+/* Rotate project1.jpeg 90 degrees to the right and match Project 2 size */
+.page-content img[src*="project1.jpeg"],
+.post-content img[src*="project1.jpeg"] {
+  transform: rotate(90deg);
+  transform-origin: center center;
+  max-width: 1200px;
+  width: 100%;
+  max-height: 600px;
+  height: auto;
+  object-fit: contain;
+  margin-top: 1rem;
+  margin-bottom: 1.5em;
+}
+
+/* Ensure Project 2 image has same size constraints and spacing */
+.page-content img[src*="project2.jpg"],
+.post-content img[src*="project2.jpg"] {
+  max-width: 1200px;
+  width: 100%;
+  max-height: 600px;
+  height: auto;
+  object-fit: contain;
+  margin-top: 1rem;
+  margin-bottom: 1.5em;
+}
+
 .post-content ul {
   list-style-type: disc;
 }
@@ -513,6 +558,8 @@ body.page-content-page .site-header .site-nav--pill {
   justify-self: center;
   margin-right: 0;
   width: auto;
+  position: relative;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 body.page-content-page .site-header .site-nav--pill .trigger {
@@ -597,6 +644,8 @@ body.page-home .site-header .site-nav--pill {
   justify-self: center;
   margin-right: 0;
   width: auto;
+  position: relative;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 body.page-home .site-header .site-nav--pill .trigger {

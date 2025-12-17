@@ -8,12 +8,12 @@ Below is a curated selection of work that reflects how I approach design,
 development, and delivery. Each project includes links, screenshots, and
 stories about what I learned.
 
-## Project 1 · Smart Planner Dashboard
+## Project 1 · How does hardware work?
 
-![Smart Planner dashboard mockup](https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80)
+![Smart Planner dashboard mockup]({{ '/assets/img/project1.jpeg' | relative_url }})
 
-- **Role:** Product lead & full-stack developer  
-- **Stack:** React, Node.js, MongoDB, Tailwind CSS  
+- **Role:** Team lead  
+- **Stack:** Logic gates  
 - **Highlights:**
   - Built dynamic sprint planner that converts course requirements into weekly
     action items.
@@ -27,7 +27,7 @@ academic advising flow for our department.
 
 ## Project 2 · Hour of Code Story Builder
 
-![Hour of Code workshop photo](https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=1200&q=80)
+![Hour of Code workshop photo]({{ '/assets/img/project2.jpg' | relative_url }})
 
 - **Role:** Curriculum designer & facilitator  
 - **Stack:** MakeCode, micro:bit, Scratch  
